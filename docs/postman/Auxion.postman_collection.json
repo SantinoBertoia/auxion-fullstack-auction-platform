@@ -1,0 +1,323 @@
+{
+  "info": {
+    "name": "Auxion Local API",
+    "description": "Local Postman collection for Auxion. Start with Healthcheck, then Login. The collection uses {{baseUrl}} and stores the JWT in {{token}}. Back-office requests use an authenticated employee JWT.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "auctionId",
+      "value": ""
+    },
+    {
+      "key": "lotId",
+      "value": ""
+    },
+    {
+      "key": "paymentMethodId",
+      "value": ""
+    },
+    {
+      "key": "bidAmount",
+      "value": "10100"
+    }
+  ],
+  "item": [
+    {
+      "name": "Healthcheck",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login - Juan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) pm.collectionVariables.set('token', data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@email.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios/login"
+          }
+        },
+        {
+          "name": "Login - Invalid Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@email.com\",\n  \"password\": \"wrong-password\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios/login"
+          }
+        },
+        {
+          "name": "Login - Backoffice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) pm.collectionVariables.set('token', data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"backoffice@auxion.local\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Me",
+      "item": [
+        {
+          "name": "Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/usuarios/me/perfil"
+          }
+        },
+        {
+          "name": "Payment Methods",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "const payment = (data.payments || []).find((item) => item.moneda === 'USD' && Number(item.verificado) === 1);",
+                  "if (payment) pm.collectionVariables.set('paymentMethodId', payment.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/usuarios/me/pagos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auctions",
+      "item": [
+        {
+          "name": "List Auctions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "const auction = (data.auctions || []).find((item) => item.estado === 'abierta') || (data.auctions || [])[0];",
+                  "if (auction) pm.collectionVariables.set('auctionId', auction.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{baseUrl}}/subastas"
+          }
+        },
+        {
+          "name": "Auction Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subastas/{{auctionId}}"
+          }
+        },
+        {
+          "name": "Enter Auction Room",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/subastas/{{auctionId}}/ingresar"
+          }
+        },
+        {
+          "name": "Live Room State",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.currentLot) pm.collectionVariables.set('lotId', data.currentLot.id);",
+                  "if (data.suggestedMinimum) pm.collectionVariables.set('bidAmount', data.suggestedMinimum);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/subastas/{{auctionId}}/estado"
+          }
+        },
+        {
+          "name": "Place Valid Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lote_id\": {{lotId}},\n  \"medio_pago_id\": {{paymentMethodId}},\n  \"monto\": {{bidAmount}}\n}"
+            },
+            "url": "{{baseUrl}}/subastas/{{auctionId}}/pujar"
+          }
+        },
+        {
+          "name": "Place Invalid Bid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lote_id\": {{lotId}},\n  \"medio_pago_id\": {{paymentMethodId}},\n  \"monto\": 1\n}"
+            },
+            "url": "{{baseUrl}}/subastas/{{auctionId}}/pujar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Articles",
+      "item": [
+        {
+          "name": "My Articles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/articulos"
+          }
+        },
+        {
+          "name": "Create Article Proposal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Demo collectible camera\",\n  \"descripcion\": \"Camera submitted from the local Postman collection.\",\n  \"informacion_historica\": \"Owned by the same family for several years.\",\n  \"documento_origen\": \"demo-origin.pdf\",\n  \"declaracion_propiedad\": true,\n  \"acepta_devolucion_con_cargo\": true,\n  \"fotos\": [\n    \"https://example.test/demo-1.jpg\",\n    \"https://example.test/demo-2.jpg\",\n    \"https://example.test/demo-3.jpg\",\n    \"https://example.test/demo-4.jpg\",\n    \"https://example.test/demo-5.jpg\",\n    \"https://example.test/demo-6.jpg\"\n  ],\n  \"precio_estimado\": 9000\n}"
+            },
+            "url": "{{baseUrl}}/articulos/propuesta"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Backoffice",
+      "item": [
+        {
+          "name": "Verify Payment Method",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"verificado\"\n}"
+            },
+            "url": "{{baseUrl}}/usuarios/pagos/{{paymentMethodId}}/verificacion"
+          }
+        }
+      ]
+    }
+  ]
+}
