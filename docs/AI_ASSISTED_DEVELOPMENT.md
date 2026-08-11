@@ -8,7 +8,7 @@ Santino remained responsible for deciding what to accept, adjust, or reject, and
 
 ChatGPT was used with:
 
-- Model: GPT-5.6 Pro.
+- Model: GPT-5.6 Sol.
 - Reasoning effort: Very High / Pro.
 
 ChatGPT was used for:
