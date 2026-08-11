@@ -146,8 +146,8 @@ Full validation details are available in [docs/VALIDATION.md](docs/VALIDATION.md
 1. Clone the repository.
 
 ```bash
-git clone https://github.com/SantinoBertoia/auxion-subastas-tienda-pago.git
-cd auxion-subastas-tienda-pago
+git clone https://github.com/SantinoBertoia/auxion-fullstack-auction-platform.git
+cd auxion-fullstack-auction-platform
 ```
 
 2. Copy the environment examples.
