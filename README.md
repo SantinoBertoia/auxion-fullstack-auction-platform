@@ -61,7 +61,7 @@ The local database can be created from scratch and does not depend on a copy of 
 
 AI was used as an engineering assistant during the portfolio-improvement stage:
 
-- ChatGPT, using GPT-5.6 Pro with Very High / Pro reasoning effort, was used for repository analysis, project selection, architecture review, improvement planning, iterative review, and conversion of Santino's informal requirements into structured Codex prompts.
+- ChatGPT, using GPT-5.6 Sol with Very High / Pro reasoning effort, was used for repository analysis, project selection, architecture review, improvement planning, iterative review, and conversion of Santino's informal requirements into structured Codex prompts.
 - OpenAI Codex, using GPT-5.5 with Extra High reasoning effort, was used to implement the approved changes.
 - Santino reviewed the code and reports, manually validated Docker, PostgreSQL, the backend, and Expo Web, and tested the principal flows.
 - GitHub Actions provided an additional automated verification layer.
